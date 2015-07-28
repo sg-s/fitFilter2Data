@@ -1,6 +1,25 @@
 # fitFilter2Data
 
-This toolbox fits a linear filter to time series data with one input and one output. 
+This MATLAB toolbox fits a linear filter to time series data with one input and one output. 
+
+## Requirements
+
+1. MATLAB 
+
+## Installation
+
+The recommended way to install `fitFilter2Data` is to use my package manager:
+
+>> urlwrite('http://srinivas.gs/install.m','install.m'); 
+>> install fitFilter2Data
+>> install srinivas.gs_mtools
+
+if you have git installed, you can
+
+git clone https://github.com/sg-s/fitFilter2Data
+git clone https://github.com/sg-s/srinivas.gs_mtools # fitFilter2Data needs this to work
+
+and don't forget to add these folders to your MATLAB path
 
 ## Methods
 
@@ -20,3 +39,7 @@ extracts filter from input vector x and output vector y using reverse correlatio
 uses inverse fourier transform of Transfer function to reconstruct filter
 ### [fitFilter2Data.m](https://github.com/sg-s/fitFilter2Data/blob/master/fitFilter2Data.m)
 fit a filter to input-output time series
+
+## License 
+
+[GPL](http://choosealicense.com/licenses/gpl-2.0/#)

@@ -18,9 +18,6 @@ if isnan(f_tau)
 	f_tau = f_cut/3;
 end
 
-f_cut
-f_tau
-
 % roll off contributions of higher frequencies
 S = exp(-abs(W-f_cut)./f_tau);
 S(W<f_cut) = 1;
