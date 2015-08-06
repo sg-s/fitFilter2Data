@@ -9,15 +9,16 @@ This MATLAB toolbox fits a linear filter to time series data with one input and 
 ## Installation
 
 The recommended way to install `fitFilter2Data` is to use my package manager:
-```
+
+```matlab
 >> urlwrite('http://srinivas.gs/install.m','install.m'); 
 >> install fitFilter2Data
->>install srinivas.gs_mtools
+>> install srinivas.gs_mtools
 ```
 
 if you have git installed, you can
 
-```
+```bash
 git clone https://github.com/sg-s/fitFilter2Data
 git clone https://github.com/sg-s/srinivas.gs_mtools # fitFilter2Data needs this to work
 ```
@@ -31,6 +32,8 @@ and don't forget to add these folders to your MATLAB path
 3. Fourier Transform
 
 ## Function Description
+
+What follows is a machine-generated summary of what each function in this repository does. For more detailed descriptions, try `help functionName`
 
 ### [FindBestFilter.m](https://github.com/sg-s/fitFilter2Data/blob/master/FindBestFilter.m)
 fits the "best" filter to data. a wrapper for FitFilter2Data

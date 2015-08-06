@@ -5,7 +5,7 @@
 % 
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 % To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
-function [K, C] = fitFilter2Data(stim, resp, varargin)
+function [K, filtertime] = fitFilter2Data(stim, resp, varargin)
 if ~nargin
 	help FitFilter2Data
 	return
@@ -15,7 +15,8 @@ end
 filter_length = 1000;
 reg = NaN; % in units of mean of eigenvalues of C
 normalise = true; % remove mean, divide through the std. dev.
-method = 'transfer-function';
+method = 'least-squares';
+offset = 0;
 
 % evaluate optional inputs
 if iseven(nargin)
@@ -58,6 +59,13 @@ if isvector(stim) && isvector(resp)
 		resp = resp/std(resp);
 		stim =  stim/std(stim);
 	end
+
+	% handle an offset, if any
+	if offset ~= 0 
+		stim = stim(offset:end);
+		resp = resp(1:end-offset+1);
+	end
+	filtertime = [-offset+1:filter_length-offset+1];
 
 	switch method
 		case {'transfer-function','tf'}
