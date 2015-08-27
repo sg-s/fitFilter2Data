@@ -6,13 +6,14 @@
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 % To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 	
-function [K] = ff_leastsquares(stim,resp,filter_length,reg)
-
-
-OnlyThesePoints = filter_length+1:length(stim);
+function [K] = ff_leastsquares(stim,resp,filter_length,reg,OnlyThesePoints)
 
 % throw away parts of the response for which we don't care
 resp = resp(OnlyThesePoints);
+
+if length(OnlyThesePoints) == length(stim)
+    OnlyThesePoints = find(OnlyThesePoints);
+end
 
 % chop up the stimulus into blocks  
 s = zeros(length(OnlyThesePoints), filter_length+1);
