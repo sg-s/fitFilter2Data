@@ -44,7 +44,8 @@ if isvector(stim) && isvector(resp)
 	resp = resp(:);
 
 	% throw out NaNs
-	rm_this = (isnan(stim) | isnan(resp)) & OnlyThesePoints; 
+	rm_this = (isnan(resp));
+	rm_this = intersect(find(rm_this),OnlyThesePoints);
 	stim(rm_this) = [];
 	resp(rm_this) = [];
 
@@ -64,9 +65,9 @@ if isvector(stim) && isvector(resp)
 
 	% handle an offset, if any
 	if offset ~= 0 
-		stim = stim(offset:end);
-		resp = resp(1:end-offset+1);
-		OnlyThesePoints = OnlyThesePoints(1:end-offset+1);
+		stim = [stim; NaN(offset,1)]; 
+		resp = [NaN(offset,1); resp];
+		OnlyThesePoints = [false(offset,1); OnlyThesePoints];
 	end
 	filtertime = [-offset+1:filter_length-offset+1];
 
