@@ -17,6 +17,7 @@ end
 
 % chop up the stimulus into blocks  
 s = zeros(length(OnlyThesePoints), filter_length+1);
+
 for i=2:length(OnlyThesePoints)
 	s(i,:) = stim(OnlyThesePoints(i):-1:OnlyThesePoints(i)-filter_length);
 end

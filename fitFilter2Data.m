@@ -43,6 +43,9 @@ if isvector(stim) && isvector(resp)
 	stim = stim(:);
 	resp = resp(:);
 
+	assert(length(stim)==length(resp),'stimulus and response vectors should be the same length');
+	assert(length(OnlyThesePoints) == length(stim),'OnlyThesePoints should be as long as stim');
+
 	% throw out NaNs
 	rm_this = (isnan(resp));
 	rm_this = intersect(find(rm_this),OnlyThesePoints);
@@ -67,7 +70,7 @@ if isvector(stim) && isvector(resp)
 	if offset ~= 0 
 		stim = [stim; NaN(offset,1)]; 
 		resp = [NaN(offset,1); resp];
-		OnlyThesePoints = [false(offset,1); OnlyThesePoints];
+		OnlyThesePoints = [false(offset-1,1); OnlyThesePoints];
 	end
 	filtertime = [-offset+1:filter_length-offset+1];
 
