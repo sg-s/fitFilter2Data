@@ -17,7 +17,6 @@ reg = NaN; % in units of mean of eigenvalues of C
 normalise = true; % remove mean, divide through the std. dev.
 method = 'least-squares';
 offset = 0;
-OnlyThesePoints = filter_length+1:length(stim);
 
 % evaluate optional inputs
 if iseven(nargin)
@@ -31,62 +30,39 @@ else
     error('Inputs need to be name value pairs')
 end
 
+% defensive programming
+assert(isvector(stim) && isvector(resp),'Stimulus and response should be vectors')
+assert(length(stim)==length(resp),'stimulus and response vectors should be the same length');
+assert(~any(isnan(stim)),'Stimulus vector should not contain any NaN')
+assert(~any(isinf(stim)),'Stimulus vector cannot contain Infinities')
+assert(~any(isinf(resp)),'Response vector cannot contain Infinities')
 
+% ensure column
+stim = stim(:);
+resp = resp(:);
 
+% normalise
+if normalise
+	resp = resp - nanmean(resp);
+	stim = stim - mean(stim);
+	resp = resp/nanstd(resp);
+	stim = stim/std(stim);
+end
 
-% check that stimulus and resp are OK
+% handle an offset, if any
+if offset ~= 0 
+	stim = [stim; NaN(offset,1)]; 
+	resp = [NaN(offset,1); resp];
+end
+filtertime = [-offset+1:filter_length-offset];
 
-if isvector(stim) && isvector(resp)
-	% stimulus and resp are both vectors, so do it the easy way
-
-	% ensure column
-	stim = stim(:);
-	resp = resp(:);
-
-	assert(length(stim)==length(resp),'stimulus and response vectors should be the same length');
-	assert(length(OnlyThesePoints) == length(stim),'OnlyThesePoints should be as long as stim');
-
-	% throw out NaNs
-	rm_this = (isnan(resp));
-	rm_this = intersect(find(rm_this),OnlyThesePoints);
-	stim(rm_this) = [];
-	resp(rm_this) = [];
-
-	% check that there are no Infs
-	if sum(isinf(stim)) || sum(isinf(resp))
-		error('Inf in inputs/outputs, cannot continue')
-	end
-
-
-	% normalise
-	if normalise
-		resp = resp - nanmean(resp);
-		stim = stim - nanmean(stim);
-		resp = resp/nanstd(resp);
-		stim =  stim/nanstd(stim);
-	end
-
-	% handle an offset, if any
-	if offset ~= 0 
-		stim = [stim; NaN(offset,1)]; 
-		resp = [NaN(offset,1); resp];
-		OnlyThesePoints = [false(offset-1,1); OnlyThesePoints];
-	end
-	filtertime = [-offset+1:filter_length-offset+1];
-
-	switch method
-		case {'transfer-function','tf'}
-			K = ff_tfestimate(stim,resp,filter_length,reg);
-		case {'least-squares','ls'}
-			K = ff_leastsquares(stim,resp,filter_length,reg,OnlyThesePoints);
-		case {'reverse-correlation','rc'}
-			K = ff_revCorr(stim,resp,filter_length,reg);
-	end
-
-
-else
-	error('Stimulus or response is not a vector, cannot continue. Fitting multiple datasets? Use the OnlyThesePoints option. ')
-
+switch method
+	case {'transfer-function','tf'}
+		K = ff_tfestimate(stim,resp,filter_length,reg);
+	case {'least-squares','ls'}
+		K = ff_leastsquares(stim,resp,filter_length,reg);
+	case {'reverse-correlation','rc'}
+		K = ff_revCorr(stim,resp,filter_length,reg);
 end
 
 

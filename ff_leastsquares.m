@@ -6,26 +6,32 @@
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 % To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 	
-function [K] = ff_leastsquares(stim,resp,filter_length,reg,OnlyThesePoints)
+function [K] = ff_leastsquares(stim,resp,filter_length,reg)
 
 % throw away parts of the response for which we don't care
-resp = resp(OnlyThesePoints);
+only_these_points = find(~isnan(resp));
+only_these_points(only_these_points<filter_length+1) = []; % we can't use this bit
 
-if length(OnlyThesePoints) == length(stim)
-    OnlyThesePoints = find(OnlyThesePoints);
+% if there is an offset, we introduced some NaNs into the stim
+if any(isnan(stim))
+    only_these_points(only_these_points>find(~isnan(stim),1,'last')) = [];
+else
+    
 end
 
-% chop up the stimulus into blocks  
-s = zeros(length(OnlyThesePoints), filter_length+1);
+resp = resp(only_these_points);
 
-for i=2:length(OnlyThesePoints)
-	s(i,:) = stim(OnlyThesePoints(i):-1:OnlyThesePoints(i)-filter_length);
+
+% chop up the stimulus into blocks  
+s = zeros(length(only_these_points), filter_length);
+
+for i = 1:length(only_these_points)
+	s(i,:) = stim(only_these_points(i):-1:only_these_points(i)-filter_length+1);
 end
 
 % compute covariance matrix
 C = s'*s; % this is the covariance matrix, scaled by the size of the C
 % scale reg by mean of eigenvalues
-
 
 % determine condition parameter 
 c = cond(C);
