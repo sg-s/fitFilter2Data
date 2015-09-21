@@ -130,7 +130,7 @@ try
 	subplot(1,2,2), hold on
 	l = [];
 	for i = 1:length(noise)
-		l(i) = plot(filtertime,Khat(:,i),'Color',c(i,:))
+		l(i) = plot(filtertime,Khat(:,i),'Color',c(i,:));
 	end
 	legend(l,L)
 	title('Reconstructed filter')
