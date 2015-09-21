@@ -30,6 +30,9 @@ else
     error('Inputs need to be name value pairs')
 end
 
+% read pref file
+pref = readPref(which(mfilename));
+
 % defensive programming
 assert(isvector(stim) && isvector(resp),'Stimulus and response should be vectors')
 assert(length(stim)==length(resp),'stimulus and response vectors should be the same length');

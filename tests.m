@@ -17,10 +17,13 @@ tic
 
 
 %% 
-% This document runs tests for fitFilter2Data. Run the tests and generate a report using 
+% This document runs tests for fitFilter2Data. Run the tests and generate a report (this document) using 
 %
 %  makePDF('tests.m')
 % 
+
+%%
+% You can run these tests with the debug_mode set to "true" in the preferences file (pref.m) to see more of the inner working of this toolbox in each test. 
 
 %% 1. White Noise Inputs, No Noise
 % In this section, we test the simplest possible case: white noise inputs, no additional noise, with a bilobed filter. This test passes if the backed out filter (red) and the actual filter (black) match perfectly (shapewise). 
@@ -142,7 +145,83 @@ catch err
 	disp(err.message)
 end
 
+%% 5. Only Some Points, Offset, Additive Noise, Correlated Inputs
+% Now, we repeat the tests as before, but introduce correlations into the input. 
 
+
+try
+	noise = -.5;
+	corr_length = ceil(logspace(1,2,5));
+	c = parula(length(corr_length)+1);
+	Khat = NaN(600,length(corr_length));
+	L = {};
+	for i = 1:length(corr_length)
+		x = filter(ones(corr_length(i),1),corr_length(i),randn(1e4,1));
+		only_these_points = (rand(length(y),1)>.5);
+		y2 = filter(K,1,x) + noise*randn(length(y),1);
+		y2(~only_these_points) = NaN; 
+		[Khat(:,i),filtertime] = fitFilter2Data(x,y2,'filter_length',600,'offset',100);
+		L{i} = ['corr =' oval((corr_length(i)))];
+	end
+
+	figure('outerposition',[0 0 1000 500],'PaperUnits','points','PaperSize',[1000 500]); hold on
+	subplot(1,2,1), hold on
+	plot(-99:500,[zeros(1,100) K],'k')
+	title('Actual filter')
+
+	subplot(1,2,2), hold on
+	l = [];
+	for i = 1:length(corr_length)
+		l(i) = plot(filtertime,Khat(:,i),'Color',c(i,:));
+	end
+	legend(l,L)
+	title('Reconstructed filter')
+
+	prettyFig()
+	disp('test 5 passed')
+catch err
+	disp('test 5 failed with error:')
+	disp(err.message)
+end
+
+
+%% 6. Only Some Points, Offset, Additive Noise, Correlated Inputs, fixed regularisation
+% Now, we repeat the tests as before, with introduce correlations into the input, but force a fixed regularisation (here, equal to the mean of the eigenvalue of the covariance matrix of the input) 
+
+try
+	noise = -.5;
+	corr_length = ceil(logspace(1,2,5));
+	c = parula(length(corr_length)+1);
+	Khat = NaN(600,length(corr_length));
+	L = {};
+	for i = 1:length(corr_length)
+		x = filter(ones(corr_length(i),1),corr_length(i),randn(1e4,1));
+		only_these_points = (rand(length(y),1)>.5);
+		y2 = filter(K,1,x) + noise*randn(length(y),1);
+		y2(~only_these_points) = NaN; 
+		[Khat(:,i),filtertime] = fitFilter2Data(x,y2,'filter_length',600,'offset',100,'reg',1);
+		L{i} = ['corr =' oval((corr_length(i)))];
+	end
+
+	figure('outerposition',[0 0 1000 500],'PaperUnits','points','PaperSize',[1000 500]); hold on
+	subplot(1,2,1), hold on
+	plot(-99:500,[zeros(1,100) K],'k')
+	title('Actual filter')
+
+	subplot(1,2,2), hold on
+	l = [];
+	for i = 1:length(corr_length)
+		l(i) = plot(filtertime,Khat(:,i),'Color',c(i,:));
+	end
+	legend(l,L)
+	title('Reconstructed filter')
+
+	prettyFig()
+	disp('test 6 passed')
+catch err
+	disp('test 6 failed with error:')
+	disp(err.message)
+end
 
 %% Version Info
 % The file that generated this document is called:

@@ -8,6 +8,9 @@
 	
 function [K] = ff_leastsquares(stim,resp,filter_length,reg)
 
+% read pref file
+pref = readPref(which(mfilename));
+
 % throw away parts of the response for which we don't care
 only_these_points = find(~isnan(resp));
 only_these_points(only_these_points<filter_length+1) = []; % we can't use this bit
@@ -15,6 +18,9 @@ only_these_points(only_these_points<filter_length+1) = []; % we can't use this b
 % if there is an offset, we introduced some NaNs into the stim
 if any(isnan(stim))
     only_these_points(only_these_points>find(~isnan(stim),1,'last')) = [];
+    if pref.debug_mode
+        disp('ff_leastsquares::NaNs in stim, throwing some stuff out')
+    end
 else
     
 end
@@ -37,11 +43,18 @@ C = s'*s; % this is the covariance matrix, scaled by the size of the C
 c = cond(C);
 oldC = C;
 if isnan(reg)
+    if pref.debug_mode
+        disp('ff_leastsquares::No regularisation factor provided, will try to figure this out on my own...')
+    end
     if c < length(C)
-    	% all OK
+    	if pref.debug_mode
+            disp('ff_leastsquares::covariance matrix is well conditioned. Will not try to regularise')
+        end
     	r = 0;
     else
-    	% use a binary search to find the best value to regularise by
+    	if pref.debug_mode
+            disp('ff_leastsquares::Covariance matrix badly conditioned. Will perform a binary search for the best condition number...')
+        end
     	rmin = 0;
     	rmax = 1/(2*eps);
     	r = c;
@@ -60,8 +73,15 @@ if isnan(reg)
     		
     	end
     end
+    if pref.debug_mode
+        disp('ff_leastsquares::the best regularisation factor I found was:')
+        disp(r)
+    end
     C = oldC + eye(length(C))*r;
 else
+    if pref.debug_mode
+        disp('ff_leastsquares::Regularisation factor specified. Scaling by the mean eigenvalue...')
+    end
 	MeanEigenValue = trace(C)/length(C); % cheat; this is the same as mean(eig(C))
 	r = reg*MeanEigenValue;
     C = (C + r*eye(length(C)))*trace(C)/(trace(C) + r*length(C));
