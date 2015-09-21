@@ -16,10 +16,10 @@ end
 tic
 
 
-%% Tests for fitFilter2Data
+%% 
 % This document runs tests for fitFilter2Data. Run the tests and generate a report using 
 %
-% 	makePDF('tests.m')
+%  makePDF('tests.m')
 % 
 
 %% 1. White Noise Inputs, No Noise
