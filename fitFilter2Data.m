@@ -36,7 +36,7 @@ pref = readPref(which(mfilename));
 % defensive programming
 assert(isvector(stim) && isvector(resp),'Stimulus and response should be vectors')
 assert(length(stim)==length(resp),'stimulus and response vectors should be the same length');
-assert(~any(isnan(stim)),'Stimulus vector should not contain any NaN')
+% assert(~any(isnan(stim)),'Stimulus vector should not contain any NaN')
 assert(~any(isinf(stim)),'Stimulus vector cannot contain Infinities')
 assert(~any(isinf(resp)),'Response vector cannot contain Infinities')
 
@@ -47,9 +47,9 @@ resp = resp(:);
 % normalise
 if normalise
 	resp = resp - nanmean(resp);
-	stim = stim - mean(stim);
+	stim = stim - nanmean(stim(~isnan(resp)));
 	resp = resp/nanstd(resp);
-	stim = stim/std(stim);
+	stim = stim/nanstd(stim(~isnan(resp)));
 end
 
 % handle an offset, if any
