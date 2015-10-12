@@ -1,5 +1,10 @@
 % fitFilter2Data.m
 % fit a filter to input-output time series
+% minimal usage:
+% [K, filtertime] = fitFilter2Data(stim, resp)
+% 
+% full usage:
+% [K, filtertime] = fitFilter2Data(stim, resp,'filter_length',100,'reg',1,'normalise',false,'method','least-squares','offset',10);
 % 
 % created by Srinivas Gorur-Shandilya at 2:38 , 28 July 2015. Contact me at http://srinivas.gs/contact/
 % 
