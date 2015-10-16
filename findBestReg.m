@@ -57,7 +57,7 @@ resp = resp(:);
 % split the data into two -- training and test
 sp = floor(length(stim)/2);
 test_stim = stim(1:sp);
-test_resp = stim(1:sp);
+test_resp = resp(1:sp);
 
 stim = stim(sp:end);
 resp = resp(sp:end);
@@ -69,33 +69,40 @@ reg_min = 1e-3;
 reg = reg*ones(nsteps,1);
 
 for i = 1:nsteps
-	% disp(i)
-	% disp([reg_min reg_max])
 	% get filter using this reg
 	[K, filtertime] = fitFilter2Data(stim, resp,'filter_length',filter_length,'reg',reg(i),'normalise',normalise,'offset',offset,'method','least-squares');
+
 	test_pred = convolve(1:length(test_stim),test_stim,K,filtertime);
 	err(i) = 1 - rsquare(test_pred,test_resp);
 
 	if i == 1
-		reg(i+1) = reg(i)*2;
+		reg(i+1) = reg(i)/2;
 	end
 
 	if i > 1
 		if err(i) - err(i-1) > 0
-			% disp('errors increasing')
+			if pref.debug_mode
+				disp('errors increasing')
+			end
 			% so reverse whatever you were doing
 			delta_reg = reg(i) - reg(i-1);
 			if delta_reg > 0
-				% disp('reg was increasing. so will decrease now')
+				if pref.debug_mode
+					disp('reg was increasing. so will decrease now')
+				end
 				reg(i+1) = exp((log(reg(i)) + log(reg_min))/2);
 				reg_max = reg(i);
 			else
-				% disp('reg was decreasing. so will increase now')
+				if pref.debug_mode
+					disp('reg was decreasing. so will increase now')
+				end
 				reg(i+1) = exp((log(reg(i)) + log(reg_max))/2);
 				reg_min = reg(i);
 			end
 		else
-			% disp('errors decreasing ')
+			if pref.debug_mode
+				disp('errors decreasing ')
+			end
 			% so keep doing whatever you were doing
 			delta_reg = reg(i) - reg(i-1);
 			if delta_reg > 0
@@ -111,14 +118,19 @@ for i = 1:nsteps
 		end
 	end
 
-	if (reg_max - reg_min) < 1
+	if (reg_max - reg_min) < 1 && i > 10 
 		return
 	end
+	if pref.debug_mode
+		disp('Current reg, error:')
+		disp([reg(i) err(i)])
 
+
+	end
+	
 end
 
-% disp('Best reg was:')
-% disp(reg(end))
+
 
 
 
