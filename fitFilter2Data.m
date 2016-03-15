@@ -10,33 +10,47 @@
 % 
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 % To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
-function [K, filtertime] = fitFilter2Data(stim, resp, varargin)
-if ~nargin
+function [varargout] = fitFilter2Data(stim, resp, varargin)
+if ~nargin && ~nargout
 	help FitFilter2Data
 	return
 end
 
-% defaults
-filter_length = 1000;
-reg = NaN; % in units of mean of eigenvalues of C
-normalise = true; % remove mean, divide through the std. dev.
-method = 'least-squares';
-offset = 0;
+% options and defaults
+options.filter_length = 1000;
+options.reg = 1; % in units of mean of eigenvalues of C
+options.normalise = true; % remove mean, divide through the std. dev.
+options.method = 'least-squares';
+options.offset = 0;
+options.debug_mode = false;
 
-% evaluate optional inputs
-if iseven(nargin)
-	for ii = 1:2:length(varargin)-1
-    	temp = varargin{ii};
-    	if ischar(temp)
-        	eval(strcat(temp,'=varargin{ii+1};'));
-    	end
-	end
-else
-    error('Inputs need to be name value pairs')
+
+if nargout && ~nargin 
+	varargout{1} = options;
+	return
 end
 
-% read pref file
-pref = readPref(which(mfilename));
+% validate and accept options
+if iseven(length(varargin))
+	for ii = 1:2:length(varargin)-1
+	temp = varargin{ii};
+    if ischar(temp)
+    	if ~any(find(strcmp(temp,fieldnames(options))))
+    		disp(['Unknown option: ' temp])
+    		disp('The allowed options are:')
+    		disp(fieldnames(options))
+    		error('UNKNOWN OPTION')
+    	else
+    		options = setfield(options,temp,varargin{ii+1});
+    	end
+    end
+end
+elseif isstruct(varargin{1})
+	% should be OK...
+	options = varargin{1};
+else
+	error('Inputs need to be name value pairs')
+end
 
 % defensive programming
 assert(isvector(stim) && isvector(resp),'Stimulus and response should be vectors')
@@ -50,7 +64,7 @@ stim = stim(:);
 resp = resp(:);
 
 % normalise
-if normalise
+if options.normalise
 	resp = resp - nanmean(resp);
 	stim = stim - nanmean(stim(~isnan(resp)));
 	resp = resp/nanstd(resp);
@@ -58,22 +72,35 @@ if normalise
 end
 
 % handle an offset, if any
-if offset ~= 0 
-	stim = [stim; NaN(offset,1)]; 
-	resp = [NaN(offset,1); resp];
+if options.offset ~= 0 
+	stim = [stim; NaN(options.offset,1)]; 
+	resp = [NaN(options.offset,1); resp];
 end
-filtertime = [-offset+1:filter_length-offset];
+filtertime = (-options.offset+1:options.filter_length-options.offset);
 
-switch method
+switch options.method
 	case {'transfer-function','tf'}
-		K = ff_tfestimate(stim,resp,filter_length,reg);
+		K = ff_tfestimate(stim,resp,options.filter_length,options.reg);
 	case {'least-squares','ls'}
-		K = ff_leastsquares(stim,resp,filter_length,reg);
+		K = ff_leastsquares(stim,resp,options.filter_length,options.reg);
 	case {'reverse-correlation','rc'}
-		K = ff_revCorr(stim,resp,filter_length,reg);
+		K = ff_revCorr(stim,resp,options.filter_length,options.reg);
 end
 
+switch nargout
+case 0
+	figure('outerposition',[0 0 800 800],'PaperUnits','points','PaperSize',[800 800]); hold on
+	plot(filtertime,K,'k')
+	xlabel('Fitler Lag (s)')
+	ylabel('Filter')
+	prettyFig();
 
+case 1
+	varargout{1} = K;
+case 2
+	varargout{1} = K;
+	varargout{2} = filtertime;
+end
 
 
 
