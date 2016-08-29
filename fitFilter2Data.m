@@ -63,13 +63,11 @@ assert(~any(isinf(resp)),'Response vector cannot contain Infinities')
 stim = stim(:);
 resp = resp(:);
 
-% normalise
-if options.normalise
-	resp = resp - nanmean(resp);
-	stim = stim - nanmean(stim(~isnan(resp)));
-	resp = resp/nanstd(resp);
-	stim = stim/nanstd(stim(~isnan(resp)));
-end
+
+resp = resp - nanmean(resp);
+stim = stim - nanmean(stim(~isnan(resp)));
+
+
 
 % handle an offset, if any
 if options.offset ~= 0 
@@ -85,6 +83,12 @@ switch options.method
 		K = ff_leastsquares(stim,resp,options.filter_length,options.reg);
 	case {'reverse-correlation','rc'}
 		K = ff_revCorr(stim,resp,options.filter_length,options.reg);
+end
+
+% normalise
+if options.normalise
+	fp = circshift(convolve(1:length(stim),stim,K,filtertime),options.offset);
+	K = K*nanstd(stim)/nanstd(fp);
 end
 
 switch nargout
