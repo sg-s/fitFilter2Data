@@ -12,7 +12,7 @@ The recommended way to install `fitFilter2Data` is to use my package manager:
 
 ```matlab
 % copy any paste this into your matlab prompt
-urlwrite('http://srinivas.gs/install.m','install.m'); 
+urlwrite('https://srinivas.gs/install.m','install.m'); 
 install fitFilter2Data
 install srinivas.gs_mtools
 ```
@@ -32,7 +32,7 @@ and don't forget to add these folders to your MATLAB path
 You can run tests on this to check that everything is working by using 
 
 ```matlab
-makePDF('tests.m')
+makePDF('filename','tests.m')
 ```
 
 ## Hacking

@@ -5,15 +5,7 @@
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 % To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
-% this code determines if this function is being called by publish() or not
-calling_func = dbstack;
-being_published = 0;
-if ~isempty(calling_func)
-	if find(strcmp('publish',{calling_func.name}))
-		being_published = 1;
-	end
-end
-tic
+pHeader;
 
 
 %% 
@@ -45,6 +37,7 @@ try
 	title('Reconstructed filter')
 
 	prettyFig()
+
 
 catch err
 	disp('test 1 failed with error:')
@@ -79,6 +72,11 @@ catch err
 	disp(err.message)
 end
 
+if being_published
+	snapnow
+	delete(gcf)
+end
+
 
 %% 3. Only Some Points
 % We now want to back out the filter, using only data from only some time points. These time points can be arbitrarily picked from the data, and there is no requirement for continuity of any sort. The purpose of this test is to make sure that filter extraction works when we force it to work only with an arbitrary subset of the data. 
@@ -108,6 +106,11 @@ plot(filtertime,Khat,'r')
 title('Reconstructed filter')
 
 prettyFig()
+
+if being_published
+	snapnow
+	delete(gcf)
+end
 
 %% 4. Only Some Points, Offset, Additive Noise
 % Now, we repeat the same test, but add some Gaussian noise to the output before backing out the filter. 
@@ -143,6 +146,11 @@ try
 catch err
 	disp('test 4 failed with error:')
 	disp(err.message)
+end
+
+if being_published
+	snapnow
+	delete(gcf)
 end
 
 %% 5. Only Some Points, Offset, Additive Noise, Correlated Inputs
@@ -184,6 +192,11 @@ catch err
 	disp(err.message)
 end
 
+if being_published
+	snapnow
+	delete(gcf)
+end
+
 
 %% 6. Only Some Points, Offset, Additive Noise, Correlated Inputs, fixed regularisation
 % Now, we repeat the tests as before, with introduce correlations into the input, but force a fixed regularisation (here, equal to the mean of the eigenvalue of the covariance matrix of the input) 
@@ -223,35 +236,14 @@ catch err
 	disp(err.message)
 end
 
-%% Version Info
-% The file that generated this document is called:
-disp(mfilename)
-
-%%
-% and its md5 hash is:
-Opt.Input = 'file';
-disp(dataHash(strcat(mfilename,'.m'),Opt))
-
-%%
-% This file should be in this commit:
-[status,m]=unix('git rev-parse HEAD');
-if ~status
-	disp(m)
-end
-
-t = toc;
-
-%% 
-% This document was built in: 
-disp(strcat(oval(t,3),' seconds.'))
-
-% tag the file as being published 
-% add homebrew path
-path1 = getenv('PATH');
-path1 = [path1 ':/usr/local/bin'];
-setenv('PATH', path1);
-
 if being_published
-	unix(strjoin({'tag -a published',which(mfilename)}));
+	snapnow
+	delete(gcf)
 end
+
+
+%% Version Info
+%
+pFooter;
+
 

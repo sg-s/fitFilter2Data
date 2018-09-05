@@ -1,0 +1,6 @@
+pref.m
+.*mat
+.*DS_Store*
+*.bin
+*.asv
+*.sublime-workspace
