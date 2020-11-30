@@ -8,8 +8,6 @@
 	
 function [K] = ff_leastsquares(stim,resp,filter_length,reg)
 
-% read pref file
-pref = readPref(which(mfilename));
 
 % throw away parts of the response for which we don't care
 only_these_points = find(~isnan(resp));
@@ -18,9 +16,6 @@ only_these_points(only_these_points<filter_length+1) = []; % we can't use this b
 % if there is an offset, we introduced some NaNs into the stim
 if any(isnan(stim))
     only_these_points(only_these_points>find(~isnan(stim),1,'last')) = [];
-    if pref.debug_mode
-        disp('ff_leastsquares::NaNs in stim, throwing some stuff out')
-    end
 else
     
 end
@@ -41,9 +36,6 @@ C = s'*s; % this is the covariance matrix, scaled by the size of the C
 if isnan(reg)
     error('ff_leastsquares::regularisation factor not specified')
 else
-    if pref.debug_mode
-        disp('ff_leastsquares::Regularisation factor specified. Scaling by the mean eigenvalue...')
-    end
 	MeanEigenValue = trace(C)/length(C); % cheat; this is the same as mean(eig(C))
 	r = reg*MeanEigenValue;
 

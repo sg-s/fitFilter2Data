@@ -5,7 +5,7 @@
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 % To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
-pHeader;
+pdflib.header
 
 
 %% 
@@ -21,7 +21,7 @@ pHeader;
 % In this section, we test the simplest possible case: white noise inputs, no additional noise, with a bilobed filter. This test passes if the backed out filter (red) and the actual filter (black) match perfectly (shapewise). 
 
 x = randn(1e4,1);
-K = filter_alpha2(50,100,1,.3,1:500);
+K = filterlib.alpha2(50,100,1,.3,1:500);
 y = filter(K,1,x);
 try
 	[Khat,filtertime] = fitFilter2Data(x,y,'filter_length',500);
@@ -36,7 +36,7 @@ try
 	plot(filtertime,Khat,'r')
 	title('Reconstructed filter')
 
-	prettyFig()
+	figlib.pretty()
 
 
 catch err
@@ -65,7 +65,7 @@ try
 	plot(filtertime,Khat,'r')
 	title('Reconstructed filter')
 
-	prettyFig()
+	figlib.pretty()
 
 catch err
 	disp('test 2 failed with error:')
@@ -105,7 +105,7 @@ subplot(1,2,2), hold on
 plot(filtertime,Khat,'r')
 title('Reconstructed filter')
 
-prettyFig()
+figlib.pretty()
 
 if being_published
 	snapnow
@@ -125,7 +125,7 @@ try
 		y2 = y + noise(i)*randn(length(y),1);
 		y2(~only_these_points) = NaN; 
 		[Khat(:,i),filtertime] = fitFilter2Data(x,y2,'filter_length',600,'offset',100);
-		L{i} = ['log(noise)=' oval(log10(noise(i)))];
+		L{i} = ['log(noise)=' strlib.oval(log10(noise(i)))];
 	end
 
 	figure('outerposition',[0 0 1000 500],'PaperUnits','points','PaperSize',[1000 500]); hold on
@@ -141,7 +141,7 @@ try
 	legend(l,L)
 	title('Reconstructed filter')
 
-	prettyFig()
+	figlib.pretty()
 	disp('test 4 passed')
 catch err
 	disp('test 4 failed with error:')
@@ -169,7 +169,7 @@ try
 		y2 = filter(K,1,x) + noise*randn(length(y),1);
 		y2(~only_these_points) = NaN; 
 		[Khat(:,i),filtertime] = fitFilter2Data(x,y2,'filter_length',600,'offset',100);
-		L{i} = ['corr =' oval((corr_length(i)))];
+		L{i} = ['corr =' strlib.oval((corr_length(i)))];
 	end
 
 	figure('outerposition',[0 0 1000 500],'PaperUnits','points','PaperSize',[1000 500]); hold on
@@ -185,7 +185,7 @@ try
 	legend(l,L)
 	title('Reconstructed filter')
 
-	prettyFig()
+	figlib.pretty()
 	disp('test 5 passed')
 catch err
 	disp('test 5 failed with error:')
@@ -213,7 +213,7 @@ try
 		y2 = filter(K,1,x) + noise*randn(length(y),1);
 		y2(~only_these_points) = NaN; 
 		[Khat(:,i),filtertime] = fitFilter2Data(x,y2,'filter_length',600,'offset',100,'reg',1);
-		L{i} = ['corr =' oval((corr_length(i)))];
+		L{i} = ['corr =' strlib.oval((corr_length(i)))];
 	end
 
 	figure('outerposition',[0 0 1000 500],'PaperUnits','points','PaperSize',[1000 500]); hold on
@@ -229,7 +229,7 @@ try
 	legend(l,L)
 	title('Reconstructed filter')
 
-	prettyFig()
+	figlib.pretty()
 	disp('test 6 passed')
 catch err
 	disp('test 6 failed with error:')
@@ -244,6 +244,6 @@ end
 
 %% Version Info
 %
-pFooter;
+pdflib.footer
 
 
