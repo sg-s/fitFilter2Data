@@ -74,7 +74,7 @@ case 0
 	plot(filtertime,K,'k')
 	xlabel('Fitler Lag (s)')
 	ylabel('Filter')
-	prettyFig();
+	figlib.pretty();
 
 case 1
 	varargout{1} = K;
